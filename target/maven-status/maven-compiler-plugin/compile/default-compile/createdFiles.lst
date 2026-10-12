@@ -1,8 +1,13 @@
-model\NarapidanaPencurian.class
 model\NarapidanaPembunuhan.class
+config\TesKoneksi.class
 model\NarapidanaTerorisme.class
-model\PemeriksaanRutin.class
-controller\AdminLapas.class
-model\NarapidanaNarkotika.class
+model\Narapidana.class
+com\mycompany\lapas\Main.class
 view\NarapidanaView.class
 model\NarapidanaKorupsi.class
+model\NarapidanaPencurian.class
+model\PemeriksaanRutin.class
+config\KoneksiDatabase.class
+controller\AdminLapas.class
+model\NarapidanaNarkotika.class
+dao\NarapidanaDAO.class

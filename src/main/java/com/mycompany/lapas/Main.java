@@ -1,11 +1,6 @@
 package com.mycompany.lapas;
 
 import controller.AdminLapas;
-import model.NarapidanaNarkotika;
-import model.NarapidanaTerorisme;
-import model.NarapidanaKorupsi;
-import model.NarapidanaPembunuhan;           
-import model.NarapidanaPencurian;
 import view.NarapidanaView;
 import java.util.Scanner;
 
@@ -15,26 +10,6 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         NarapidanaView view = new NarapidanaView(scanner);
         AdminLapas admin = new AdminLapas(view);
-
-        admin.tambahDataAwal(new NarapidanaNarkotika(
-                "N001", "Galeh Pramudi", "Kepemilikan Sabu 5 Gram", 48,
-                "A1", "Blok B", "Rehabilitasi Medis"));
-
-        admin.tambahDataAwal(new NarapidanaTerorisme(
-                "N002", "Rian Saputra", "Percobaan Pengeboman", 180,
-                "C1", "Blok A", "Tinggi"));
-
-        admin.tambahDataAwal(new NarapidanaKorupsi(
-                "N003", "Glen Allen", "Korupsi Dana Desa", 50,
-                "B1", "Blok B", 150000000));
-
-        admin.tambahDataAwal(new NarapidanaPembunuhan(
-                "N004", "Doni Hartono", "Pembunuhan Berencana dalam Sengketa Warisan", 145,
-                "D1", "Blok A", "Berencana"));
-
-        admin.tambahDataAwal(new NarapidanaPencurian(
-                "N005", "Suki", "Pencurian Kendaraan Bermotor", 18,
-                "A2", "Blok C", 15000000));
 
         boolean berjalan = true;
 

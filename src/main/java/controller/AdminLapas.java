@@ -1,5 +1,6 @@
 package controller;
 
+import dao.NarapidanaDAO;
 import model.Narapidana;
 import model.NarapidanaNarkotika;
 import model.NarapidanaTerorisme;
@@ -8,19 +9,17 @@ import model.NarapidanaPembunuhan;
 import model.NarapidanaPencurian;
 import model.PemeriksaanRutin;
 import view.NarapidanaView;
-import java.util.ArrayList;
+
+import java.util.List;
 
 public class AdminLapas {
-    private ArrayList<Narapidana> daftarNarapidana;
+
+    private NarapidanaDAO narapidanaDAO;
     private NarapidanaView view;
 
     public AdminLapas(NarapidanaView view) {
-        this.daftarNarapidana = new ArrayList<>();
+        this.narapidanaDAO = new NarapidanaDAO();
         this.view = view;
-    }
-
-    public void tambahDataAwal(Narapidana n) {
-        daftarNarapidana.add(n);
     }
 
     // CREATE
@@ -35,11 +34,10 @@ public class AdminLapas {
 
         String id = view.bacaTeks("ID Narapidana");
 
-        for (Narapidana n : daftarNarapidana) {
-            if (n.getIdNapi().equalsIgnoreCase(id)) {
-                view.tampilkanPesan(">> ID sudah digunakan.");
-                return;
-            }
+        // Cek ID dari database
+        if (narapidanaDAO.cariNarapidanaById(id) != null) {
+            view.tampilkanPesan(">> ID sudah digunakan.");
+            return;
         }
 
         String nama = view.bacaTeks("Nama");
@@ -55,111 +53,137 @@ public class AdminLapas {
                 String jenisRehabilitasi = view.bacaTeks("Jenis Rehabilitasi");
                 napiBaru = new NarapidanaNarkotika(id, nama, kasus, masaTahanan, nomorSel, blokSel, jenisRehabilitasi);
             }
+
             case 2 -> {
                 String tingkatRisiko = view.bacaTeks("Tingkat Risiko (Rendah/Sedang/Tinggi)");
                 napiBaru = new NarapidanaTerorisme(id, nama, kasus, masaTahanan, nomorSel, blokSel, tingkatRisiko);
             }
+
             case 3 -> {
                 long uangPengganti = view.bacaAngkaPanjangPositif("Uang Pengganti (Rp)");
                 napiBaru = new NarapidanaKorupsi(id, nama, kasus, masaTahanan, nomorSel, blokSel, uangPengganti);
             }
+
             case 4 -> {
                 String kategoriPembunuhan = view.bacaTeks("Kategori (Berencana/Tidak Berencana)");
                 napiBaru = new NarapidanaPembunuhan(id, nama, kasus, masaTahanan, nomorSel, blokSel, kategoriPembunuhan);
             }
+
             case 5 -> {
                 long nilaiKerugian = view.bacaAngkaPanjangPositif("Nilai Kerugian (Rp)");
                 napiBaru = new NarapidanaPencurian(id, nama, kasus, masaTahanan, nomorSel, blokSel, nilaiKerugian);
             }
+
             default -> {
                 view.tampilkanPesan(">> Kategori tidak valid.");
                 return;
             }
         }
 
-        daftarNarapidana.add(napiBaru);
-        view.tampilkanPesan(">> Data narapidana berhasil ditambahkan!");
+        // Simpan ke database
+        boolean berhasil = narapidanaDAO.tambahNarapidana(napiBaru);
+
+        if (berhasil) {
+            view.tampilkanPesan(">> Data narapidana berhasil ditambahkan!");
+        } else {
+            view.tampilkanPesan(">> Gagal menambahkan data narapidana.");
+        }
     }
 
     // READ (semua)
     public void tampilkanNarapidana() {
+        List<Narapidana> daftarNarapidana = narapidanaDAO.getAllNarapidana();
+
         if (daftarNarapidana.isEmpty()) {
-        view.tampilkanPesan("Belum ada data narapidana.");
-        return;
+            view.tampilkanPesan("Belum ada data narapidana.");
+            return;
         }
 
-    for (Narapidana n : daftarNarapidana) {
-        view.tampilkanNarapidana(n);
+        for (Narapidana n : daftarNarapidana) {
+            view.tampilkanNarapidana(n);
 
-        if (n instanceof PemeriksaanRutin p) {
-            view.tampilkanPesan("Pemeriksaan   : " + p.getJenisPemeriksaan());
-            view.tampilkanPesan("-----------------------------------------------------------");
-        }
+            if (n instanceof PemeriksaanRutin p) {
+                view.tampilkanPesan("Pemeriksaan   : " + p.getJenisPemeriksaan());
+                view.tampilkanPesan("-----------------------------------------------------------");
+            }
+
             view.tampilkanPesan("");
-            
-    }
+        }
     }
 
-    // READ
+    // READ (berdasarkan kategori)
     public void tampilkanNarapidana(String kategori) {
+        List<Narapidana> daftarNarapidana = narapidanaDAO.getAllNarapidana();
+
         boolean ditemukan = false;
 
         for (Narapidana n : daftarNarapidana) {
-
             if (n.getKategori().equalsIgnoreCase(kategori)) {
                 view.tampilkanNarapidana(n);
+
                 if (n instanceof PemeriksaanRutin p) {
                     view.tampilkanPesan("Pemeriksaan  : " + p.getJenisPemeriksaan());
                 }
+
                 view.tampilkanPesan("-----------------------------------------------------------");
                 view.tampilkanPesan("");
+
                 ditemukan = true;
-            }
-        }
-
-    if (!ditemukan) {
-        view.tampilkanPesan(
-            ">> Tidak ada narapidana dengan kategori " + kategori);
-    }
-    }
-
-    // UPDATE
-    public void updateNomorSel() {
-        String idTarget = view.bacaTeks("Masukkan ID Narapidana");
-        boolean ditemukan = false;
-
-        for (Narapidana n : daftarNarapidana) {
-            if (n.getIdNapi().equals(idTarget)) {
-                String selBaru = view.bacaTeks("Nomor Sel Baru");
-                n.setNomorSel(selBaru);
-                view.tampilkanPesan(">> Nomor sel berhasil diperbarui!");
-                ditemukan = true;
-                break;
             }
         }
 
         if (!ditemukan) {
+            view.tampilkanPesan(">> Tidak ada narapidana dengan kategori " + kategori);
+        }
+    }
+
+    // UPDATE (nomor sel)
+    public void updateNomorSel() {
+        String idTarget = view.bacaTeks("Masukkan ID Narapidana");
+
+        Narapidana napi = narapidanaDAO.cariNarapidanaById(idTarget);
+
+        if (napi == null) {
             view.tampilkanPesan(">> ID Narapidana tidak ditemukan!");
+            return;
+        }
+
+        String selBaru = view.bacaTeks("Nomor Sel Baru");
+
+        try {
+            napi.setNomorSel(selBaru);
+        } catch (IllegalArgumentException e) {
+            view.tampilkanPesan(">> " + e.getMessage());
+            return;
+        }
+
+        boolean berhasil = narapidanaDAO.updateNarapidana(napi);
+
+        if (berhasil) {
+            view.tampilkanPesan(">> Nomor sel berhasil diperbarui!"
+            );
+        } else {
+            view.tampilkanPesan(">> Gagal memperbarui nomor sel."
+            );
         }
     }
 
     // DELETE
     public void hapusNarapidana() {
         String idTarget = view.bacaTeks("Masukkan ID Narapidana");
-        boolean ditemukan = false;
+        Narapidana napi = narapidanaDAO.cariNarapidanaById(idTarget);
 
-        for (int i = 0; i < daftarNarapidana.size(); i++) {
-            if (daftarNarapidana.get(i).getIdNapi().equals(idTarget)) {
-                daftarNarapidana.remove(i);
-                view.tampilkanPesan(">> Data narapidana berhasil dihapus!");
-                ditemukan = true;
-                break;
-            }
+        if (napi == null) {
+            view.tampilkanPesan(">> ID Narapidana tidak ditemukan!");
+            return;
         }
 
-        if (!ditemukan) {
-            view.tampilkanPesan(">> ID Narapidana tidak ditemukan!");
+        boolean berhasil = narapidanaDAO.hapusNarapidana(idTarget);
+
+        if (berhasil) {
+            view.tampilkanPesan(">> Data narapidana berhasil dihapus!");
+        } else {
+            view.tampilkanPesan(">> Gagal menghapus data narapidana.");
         }
     }
-
 }
