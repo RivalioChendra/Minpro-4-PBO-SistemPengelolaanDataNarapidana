@@ -644,7 +644,7 @@ Pengguna mengetik nama kategori yang ingin dilihat (misalnya "Narkotika"), lalu 
 
 **7. Keluar**
 
-![Keluar](Asset/Keluar.png)
+![Keluar](Asset/keluar.png)
 
 Pesan penutup yang muncul saat memilih menu Keluar.
   <br> <br>
