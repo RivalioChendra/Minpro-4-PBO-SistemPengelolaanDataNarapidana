@@ -580,27 +580,7 @@ Buka database lewat tombol Database di Laragon (membuka phpmyadmin), lalu:
 
 Buat database bernama `lapas` terlebih dahulu, setelah itu masuk ke database tersebut, pilih menu import, lalu pilih file lapas.sql dan klik import.
 
-```sql
-CREATE DATABASE IF NOT EXISTS lapas;
-USE lapas;
-
-CREATE TABLE IF NOT EXISTS narapidana (
-    id_napi             VARCHAR(20)  PRIMARY KEY,
-    nama                VARCHAR(100) NOT NULL,
-    kasus               VARCHAR(255) NOT NULL,
-    masa_tahanan        INT          NOT NULL,
-    nomor_sel           VARCHAR(20)  NOT NULL,
-    blok_sel            VARCHAR(20)  NOT NULL,
-    kategori            VARCHAR(20)  NOT NULL,
-    jenis_rehabilitasi  VARCHAR(100) NULL,
-    tingkat_risiko      VARCHAR(20)  NULL,
-    uang_pengganti      BIGINT       NULL,
-    kategori_pembunuhan VARCHAR(50)  NULL,
-    nilai_kerugian      BIGINT       NULL
-);
-```
-
-![Database lapas di HeidiSQL](Asset/heidisql.png)
+![Database lapas di phpmyadmin](Asset/php.png)
 
 ### Langkah 3: Pastikan Program Terhubung ke Database
 
