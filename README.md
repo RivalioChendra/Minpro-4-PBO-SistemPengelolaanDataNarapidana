@@ -578,7 +578,7 @@ Program ini membutuhkan database MySQL yang sudah menyala dan berisi tabel `nara
 
 Buka database lewat tombol Database di Laragon (membuka phpmyadmin), lalu:
 
-Import file SQL. Pilih menu File → Run SQL file... lalu pilih file `lapas.sql` dari repository ini. Jika database `lapas` belum ada, buat dulu dengan klik kanan pada koneksi → *Create new → Database, beri nama `lapas`.
+Buat database bernama `lapas` terlebih dahulu, setelah itu masuk ke database tersebut, pilih menu import, lalu pilih file lapas.sql dan klik import.
 
 ```sql
 CREATE DATABASE IF NOT EXISTS lapas;
