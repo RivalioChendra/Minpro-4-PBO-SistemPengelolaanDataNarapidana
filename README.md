@@ -10,13 +10,13 @@
 
 ## 📖 Deskripsi Program
 
-Sistem Pengelolaan Data Narapidana merupakan program yang digunakan untuk mengelola data narapidana dalam sebuah lembaga pemasyarakatan. Program ini memungkinkan admin untuk menyimpan, menampilkan, mengubah, dan menghapus data narapidana melalui menu yang tersedia. Program dibuat dengan bahasa pemograman Java dan Seluruh data disimpan secara permanen di database MySQL menggunakan JDBC, sehingga data tidak hilang ketika program ditutup.
+Sistem Pengelolaan Data Narapidana merupakan program yang digunakan untuk mengelola data narapidana dalam sebuah lembaga pemasyarakatan. Program ini memungkinkan admin untuk menyimpan, menampilkan, mengubah, dan menghapus data narapidana melalui menu yang tersedia. Seluruh data disimpan secara permanen di database MySQL, sehingga data tidak hilang ketika program ditutup.
 
 ### Aplikasi yang Digunakan
 
-| Teknologi | Keterangan |
+| Aplikasi | Keterangan |
 |---|---|
-| Java | Bahasa pemrograman (`maven.compiler.release` = 26) |
+| Java | Bahasa pemrograman |
 | Maven | Pengelola project dan dependency (`pom.xml`) |
 | MySQL | Database penyimpanan data (database `lapas`) |
 | MySQL Connector/J | Driver JDBC (`mysql-connector-j` versi 8.3.0) |
@@ -60,7 +60,7 @@ Kolom "Pemeriksaan Rutin" ini dijelaskan lebih lanjut di bagian Penerapan Interf
 ---
 
 ## 🗂️ Struktur Project MVC + DAO
-Program menggunakan struktur MVC (Model-View-Controller) untuk memisahkan bagian data, tampilan, dan pengelolaan proses program. Karena data sekarang disimpan di database, ditambahkan dua package baru: **`dao`** (Data Access Object) yang khusus mengurus perintah SQL, dan **`config`** yang khusus mengurus koneksi database. Berikut adalah struktur package program:
+Program menggunakan struktur MVC (Model-View-Controller) untuk memisahkan bagian data, tampilan, dan pengelolaan proses program. Karena data sekarang disimpan di database, ditambahkan dua package baru, `dao` (Data Access Object) yang khusus mengurus perintah SQL, dan `config` yang khusus mengurus koneksi database. Berikut adalah struktur package program:
 
 ```
 Lapas [main]
@@ -162,7 +162,7 @@ Validasi angka menggunakan `scanner.hasNextInt()`/`hasNextLong()` di dalam perul
 ## 🔐 Penerapan Encapsulation dan Inheritance
 ### Encapsulation
 
-Seluruh atribut pada class `Narapidana` dideklarasikan dengan modifier **`private`**, sehingga tidak dapat diakses langsung dari class lain. Akses hanya bisa dilakukan melalui method `public` berupa getter dan setter.
+Seluruh atribut pada class `Narapidana` dideklarasikan dengan modifier `private`, sehingga tidak dapat diakses langsung dari class lain. Akses hanya bisa dilakukan melalui method `public` berupa getter dan setter.
 
 ```java
 public abstract class Narapidana {
@@ -189,7 +189,7 @@ public abstract class Narapidana {
 }
 ```
 
-Dengan cara ini, `AdminLapas` (Controller) tidak pernah menulis `n.idNapi = "..."` secara langsung, melainkan selalu melalui `n.getIdNapi()` atau `n.setNomorSel(...)`, sehingga data tidak dapat diubah secara sembarangan dari luar class-nya. Hal yang sama berlaku untuk `NarapidanaDAO`: saat menyimpan data ke database, DAO membaca nilai atribut melalui getter (`napi.getNama()`, `napi.getNomorSel()`, dan seterusnya), bukan mengakses atributnya langsung.
+Dengan cara ini, `AdminLapas` (Controller) tidak perlu menulis `n.idNapi = "..."` secara langsung, melainkan selalu melalui `n.getIdNapi()` atau `n.setNomorSel(...)`, sehingga data tidak dapat diubah secara sembarangan dari luar class-nya. Hal yang sama berlaku untuk `NarapidanaDAO`, saat menyimpan data ke database, DAO membaca nilai atribut melalui getter (`napi.getNama()`, `napi.getNomorSel()`, dan seterusnya), bukan mengakses atributnya langsung.
 
 **Terdapat dua  jenis Encapsulation yang diterapkan yaitu:**
 
@@ -198,7 +198,7 @@ Dengan cara ini, `AdminLapas` (Controller) tidak pernah menulis `n.idNapi = "...
 
 ### Inheritance
 
-Program menerapkan inheritance dengan **1 superclass** (`Narapidana`) dan **5 subclass**, satu untuk setiap kategori kejahatan:
+Program menerapkan inheritance dengan 1 superclass (`Narapidana`) dan 5 subclass, satu untuk setiap kategori kejahatan:
 
 ```text
                          ┌───────────────────────────┐
@@ -249,9 +249,9 @@ public class NarapidanaKorupsi extends Narapidana {
 }
 ```
 
-Setiap subclass mewarisi seluruh atribut umum dari `Narapidana`, lalu menambahkan satu atribut khusus yang hanya relevan untuk kategori kejahatannya. Ini menghindari pemaksaan atribut yang tidak relevan ke seluruh narapidana, misalnya, "Uang Pengganti" hanya bermakna untuk kasus Korupsi, bukan Pencurian.
+Setiap subclass mewarisi seluruh atribut umum dari `Narapidana`, lalu menambahkan satu atribut khusus yang hanya relevan untuk kategori kejahatan Korupsi. Ini menghindari pemaksaan atribut yang tidak relevan ke seluruh narapidana, misalnya, "Uang Pengganti" hanya bermakna untuk kasus Korupsi, bukan Terorisme.
 
-> Subclass tidak meng-override `getInfo()` secara langsung, melainkan mengisi `getDetailKhusus()` dan `getKategori()`. Alasannya dijelaskan di bagian **Penerapan Abstraction** di bawah ini.
+Subclass tidak meng-override `getInfo()` secara langsung, melainkan mengisi `getDetailKhusus()` dan `getKategori()`.
 
 ---
 
@@ -289,7 +289,7 @@ Karena secara logika, tidak masuk akal ada objek "Narapidana" polos tanpa katego
 - Program tidak akan bisa membuat objek `new Narapidana(...)` secara langsung, Java akan menolaknya saat di-compile.
 - Objek hanya bisa dibuat lewat salah satu dari lima subclass-nya (`new NarapidanaKorupsi(...)`, dan seterusnya), yang masing-masing wajib mengisi `getDetailKhusus()` dan `getKategori()` miliknya sendiri.
 
-Hal ini juga berlaku saat data dibaca dari database. `NarapidanaDAO` tidak pernah membuat `new Narapidana(...)`, melainkan memilih salah satu subclass berdasarkan kolom `kategori` (dijelaskan di bagian Penerapan JDBC).
+Hal ini juga berlaku saat data dibaca dari database. `NarapidanaDAO` tidak membuat `new Narapidana(...)`, melainkan memilih salah satu subclass berdasarkan kolom `kategori`.
 
 ---
 
@@ -312,7 +312,7 @@ public String getKategori() {
 }
 ```
 
-Manfaatnya terlihat pada `AdminLapas`, yang menampung seluruh data dari database dalam satu `List<Narapidana>` walaupun isinya campuran objek dari 5 subclass berbeda:
+Hal ini berguna pada `AdminLapas`, yang menampung seluruh data dari database dalam satu `List<Narapidana>` walaupun isinya campuran objek dari 5 subclass berbeda:
 
 ```java
 public void tampilkanNarapidana() {
@@ -325,9 +325,9 @@ public void tampilkanNarapidana() {
 }
 ```
 
-Java secara otomatis memanggil `getDetailKhusus()` dan `getKategori()` sesuai jenis objek aslinya. Jika objeknya `NarapidanaKorupsi`, yang terpanggil adalah versi milik `NarapidanaKorupsi`, bukan class lain. Controller tidak perlu memeriksa satu per satu jenis objeknya, cukup memanggil `getInfo()` dan Java yang menentukan versi mana yang dijalankan di baliknya.
+Java memanggil `getDetailKhusus()` dan `getKategori()` sesuai jenis objek aslinya. Jika objeknya `NarapidanaKorupsi`, yang terpanggil adalah versi milik `NarapidanaKorupsi`, bukan class lain. Controller tidak perlu memeriksa satu per satu jenis objeknya, cukup memanggil `getInfo()` dan Java yang menentukan versi mana yang dijalankan di baliknya.
 
-Polymorphism juga dimanfaatkan di `NarapidanaDAO`: method `tambahNarapidana(Narapidana napi)` menerima parameter bertipe superclass, sehingga satu method yang sama bisa menyimpan objek dari kelima subclass. `buatObjekNarapidana()` juga mengembalikan tipe `Narapidana`, padahal objek aslinya adalah salah satu dari kelima subclass.
+Polymorphism juga dimanfaatkan di `NarapidanaDAO`, method `tambahNarapidana(Narapidana napi)` menerima parameter bertipe superclass, sehingga satu method yang sama bisa menyimpan objek dari kelima subclass. `buatObjekNarapidana()` juga mengembalikan tipe `Narapidana`.
 
 ### 2. Method Overloading
 
@@ -371,7 +371,7 @@ public interface PemeriksaanRutin {
 }
 ```
 
-Interface ini tidak di-`implements` oleh semua subclass, melainkan hanya oleh kategori yang di dunia nyata memang memiliki program pemeriksaan/pengawasan rutin secara berkala yaitu **Narkotika**, **Terorisme**, dan **Pembunuhan**. Kategori **Korupsi** dan **Pencurian** tidak memilikinya, karena tidak ada kewajiban pemeriksaan rutin semacam ini untuk kedua kasus tersebut.
+Interface ini tidak di-`implements` oleh semua subclass, melainkan hanya oleh kategori yang di dunia nyata memang memiliki program pemeriksaan/pengawasan rutin secara berkala yaitu Narkotika, Terorisme, dan Pembunuhan. Kategori Korupsi dan Pencurian tidak memilikinya, karena tidak ada kewajiban pemeriksaan rutin semacam ini untuk kedua kasus tersebut.
 
 ```java
 public class NarapidanaNarkotika extends Narapidana implements PemeriksaanRutin {
@@ -416,31 +416,175 @@ Narapidana kategori Korupsi dan Pencurian akan melewati blok `if` ini begitu saj
 
 ## 🗄️ Penerapan JDBC
 
-**JDBC (Java Database Connectivity)** adalah API standar Java untuk menghubungkan program dengan database. Pada program ini, JDBC dipakai untuk menyimpan data narapidana ke database **MySQL** bernama `lapas`, menggantikan penyimpanan sementara di `ArrayList` pada versi sebelumnya.
+JDBC (Java Database Connectivity) adalah "jembatan" yang menghubungkan program Java dengan database. Pada program ini, JDBC dipakai untuk menyimpan data narapidana ke database MySQL bernama `lapas`, menggantikan penyimpanan sementara di `ArrayList`. Dengan begitu, data tidak hilang ketika program ditutup.
 
-### 1. Dependency Driver MySQL (`pom.xml`)
+### 1. Driver MySQL
 
-Agar Java bisa berkomunikasi dengan MySQL, dibutuhkan driver JDBC. Driver ini ditambahkan pada file `pom.xml`:
+Agar Java bisa terhubung dengan MySQL, dibutuhkan driver. Driver ini ditambahkan lewat Maven di file `pom.xml`, dan akan terunduh otomatis saat project dibuka:
 
 ```xml
-<dependencies>
-    <dependency>
-        <groupId>com.mysql</groupId>
-        <artifactId>mysql-connector-j</artifactId>
-        <version>8.3.0</version>
-    </dependency>
-</dependencies>
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>8.3.0</version>
+</dependency>
 ```
 
-### 2. Struktur Database
+### 2. Struktur Tabel Database
 
-Seluruh kategori narapidana disimpan dalam satu tabel `narapidana`. Kolom `kategori` menjadi penanda jenis subclass-nya, sedangkan kolom atribut khusus (`jenis_rehabilitasi`, `tingkat_risiko`, `uang_pengganti`, `kategori_pembunuhan`, `nilai_kerugian`) hanya terisi sesuai kategorinya dan bernilai `NULL` untuk kategori lain.
+Semua kategori narapidana disimpan dalam satu tabel bernama `narapidana`. Kolom `kategori` menandai jenis narapidananya (NARKOTIKA, TERORISME, KORUPSI, PEMBUNUHAN, atau PENCURIAN), sedangkan kolom informasi tambahan hanya terisi untuk kategori yang sesuai dan dibiarkan kosong (`NULL`) untuk kategori lainnya.
+
+| Kolom | Isi | Terisi untuk kategori |
+|---|---|---|
+| `id_napi`, `nama`, `kasus`, `masa_tahanan`, `nomor_sel`, `blok_sel` | Data umum narapidana | Semua |
+| `kategori` | Jenis kategori narapidana | Semua |
+| `jenis_rehabilitasi` | Jenis rehabilitasi | Narkotika |
+| `tingkat_risiko` | Tingkat risiko | Terorisme |
+| `uang_pengganti` | Jumlah uang pengganti | Korupsi |
+| `kategori_pembunuhan` | Berencana / tidak berencana | Pembunuhan |
+| `nilai_kerugian` | Nilai kerugian | Pencurian |
+
+
+### 3. Koneksi ke Database (`KoneksiDatabase`)
+
+Class `KoneksiDatabase` (package `config`) menyimpan semua pengaturan koneksi di satu tempat, sehingga class lain tidak perlu tahu alamat atau password database.
+
+```java
+private static final String URL = "jdbc:mysql://localhost:3306/lapas";
+private static final String USER = "root";
+private static final String PASS = "";
+```
+
+| Pengaturan | Artinya |
+|---|---|
+| `URL` | Alamat database: berada di komputer sendiri (`localhost`), port `3306`, nama database `lapas` |
+| `USER` | Username MySQL (bawaan Laragon: `root`) |
+| `PASS` | Password MySQL (bawaan Laragon: kosong) |
+
+Setiap kali program butuh database, cukup memanggil `KoneksiDatabase.getConnection()` untuk mendapatkan koneksi.
+
+Class `TesKoneksi` adalah program kecil yang hanya berfungsi untuk mengecek apakah koneksi berhasil. Jika sukses, tampil "Koneksi database berhasil!", jika gagal tampil "Koneksi database gagal!" beserta penyebabnya.
+
+### 4. Data Access Object (`NarapidanaDAO`)
+
+Semua perintah SQL dikumpulkan di satu class, yaitu `NarapidanaDAO` (package `dao`). `AdminLapas` (Controller) tidak menulis SQL sendiri, tapi hanya memanggil method milik DAO. Setiap operasi CRUD punya satu method:
+
+| Operasi | Method di DAO | Fungsinya | Dipakai oleh menu |
+|---|---|---|---|
+| **Create** | `tambahNarapidana()` | Menyimpan narapidana baru | Tambah Narapidana |
+| **Read (satu data)** | `cariNarapidanaById()` | Mencari narapidana berdasarkan ID | Tambah (cek ID), Update, Hapus |
+| **Read (semua data)** | `getAllNarapidana()` | Mengambil seluruh narapidana | Tampilkan, Tampilkan Berdasarkan Kategori |
+| **Update** | `updateNarapidana()` | Mengubah nomor dan blok sel | Update Nomor Sel |
+| **Delete** | `hapusNarapidana()` | Menghapus narapidana berdasarkan ID | Hapus Narapidana |
+
+Contoh, method untuk menghapus data:
+
+```java
+public boolean hapusNarapidana(String idNapi) {
+    String sql = "DELETE FROM narapidana WHERE id_napi = ?";
+
+    try (Connection conn = KoneksiDatabase.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        pstmt.setString(1, idNapi);                 // isi tanda ? dengan ID
+        int barisBerubah = pstmt.executeUpdate();   // jalankan perintah SQL
+        return barisBerubah > 0;                    // true jika ada data yang terhapus
+
+    } catch (SQLException e) {
+        System.err.println("Gagal menghapus narapidana - " + e.getMessage());
+        return false;
+    }
+}
+```
+
+Langkah kerjanya: (1) siapkan perintah SQL, (2) buka koneksi, (3) isi nilai ID, (4) jalankan, (5) kembalikan `true`/`false` agar Controller tahu berhasil atau tidak.
+
+### 5. PreparedStatement (Tanda `?`)
+
+Pada perintah SQL, nilai dari pengguna tidak langsung digabung ke dalam teks SQL, melainkan ditandai dengan `?` lalu diisi belakangan lewat `setString()`, `setInt()`, atau `setLong()`. Dengan cara ini, apa pun yang diketik pengguna hanya dianggap sebagai data, bukan perintah SQL, sehingga program aman dari serangan SQL Injection.
+
+### 6. Menyimpan dan Membaca Objek Narapidana
+
+Menyimpan (INSERT): karena semua kategori berada di satu tabel, saat menyimpan, program mengecek jenis objeknya dengan `instanceof` lalu mengisi kolom khusus yang sesuai. Misalnya, objek `NarapidanaKorupsi` akan mengisi kolom `uang_pengganti`, sedangkan kolom khusus lainnya dibiarkan kosong.
+
+```java
+if (napi instanceof NarapidanaKorupsi) {
+    NarapidanaKorupsi n = (NarapidanaKorupsi) napi;
+    pstmt.setLong(10, n.getUangPengganti());
+}
+```
+
+Membaca (SELECT): hasil query diterima dalam bentuk `ResultSet`, yaitu tabel hasil yang dibaca baris demi baris. Setiap baris diubah kembali menjadi objek Java oleh method `buatObjekNarapidana()`, yang memilih subclass berdasarkan isi kolom `kategori`:
+
+```java
+switch (kategori) {
+    case "NARKOTIKA":
+        return new NarapidanaNarkotika(..., rs.getString("jenis_rehabilitasi"));
+    case "KORUPSI":
+        return new NarapidanaKorupsi(..., rs.getLong("uang_pengganti"));
+    // ...TERORISME, PEMBUNUHAN, dan PENCURIAN dengan pola yang sama
+}
+```
+
+Dengan begitu, data dari database kembali menjadi objek `NarapidanaNarkotika`, `NarapidanaKorupsi`, dan seterusnya, sehingga inheritance, polymorphism, dan interface tetap berjalan seperti biasa.
+
+### 7. Penutupan Koneksi dan Penanganan Error
+
+- **Koneksi ditutup otomatis.** Koneksi dan perintah SQL ditulis di dalam `try (...)` sehingga Java menutupnya sendiri setelah selesai, tanpa perlu menutup manual.
+- **Error tidak membuat program berhenti.** Jika terjadi masalah pada database (misalnya Laragon/MySQL belum menyala), DAO menangkap error tersebut dan menampilkan pesan, lalu program tetap berjalan dan Controller menampilkan pesan gagal ke pengguna.
+
+### 8. Alur Kerja MVC dengan DAO
+
+Contoh alur saat pengguna memilih menu **Hapus Narapidana**:
+
+```text
+Main ──► AdminLapas.hapusNarapidana()          [Controller]
+              │
+              ├─► NarapidanaView.bacaTeks()      [View]   : membaca ID dari keyboard
+              │
+              ├─► NarapidanaDAO.cariNarapidanaById()      : apakah ID ada di database?
+              │
+              ├─► NarapidanaDAO.hapusNarapidana()         : hapus data
+              │         │
+              │         └─► KoneksiDatabase.getConnection() ──► MySQL (database lapas)
+              │
+              └─► NarapidanaView.tampilkanPesan()[View]   : menampilkan hasil ke layar
+```
+
+---
+
+## 🖼️ Dokumentasi Hasil Uji Coba Program
+
+## 🛠️ Persiapan Database dan Laragon
+
+Program ini membutuhkan database MySQL yang sudah menyala dan berisi tabel `narapidana`. Jika langkah di bawah dilewati, program tidak bisa menyimpan maupun menampilkan data.
+
+| Langkah | Yang Dilakukan | Hasil yang Diharapkan |
+|---|---|---|
+| 1 | Jalankan Laragon, lalu klik Start All | Status Apache dan MySQL menyala |
+| 2 | Buat database `lapas` dan tabel `narapidana` (atau import file `lapas.sql`) | Database `lapas` tampil di phpMyAdmin |
+| 3 | Jalankan `TesKoneksi.java` | Muncul "Koneksi database berhasil!" |
+| 4 | Jalankan `Main.java` | Menu utama program tampil |
+
+### Langkah 1: Jalankan Laragon
+
+1. Buka aplikasi Laragon.
+2. Klik tombol Start All.
+3. Pastikan MySQL berstatus menyala. Pengaturan bawaan Laragon adalah username `root` dan password kosong, sama dengan yang tertulis di `KoneksiDatabase.java`.
+
+![Laragon Start All](Asset/laragon.png)
+
+### Langkah 2: Siapkan Database `lapas`
+
+Buka database lewat tombol Database di Laragon (membuka phpmyadmin), lalu:
+
+Import file SQL. Pilih menu File → Run SQL file... lalu pilih file `lapas.sql` dari repository ini. Jika database `lapas` belum ada, buat dulu dengan klik kanan pada koneksi → *Create new → Database, beri nama `lapas`.
 
 ```sql
-CREATE DATABASE lapas;
+CREATE DATABASE IF NOT EXISTS lapas;
 USE lapas;
 
-CREATE TABLE narapidana (
+CREATE TABLE IF NOT EXISTS narapidana (
     id_napi             VARCHAR(20)  PRIMARY KEY,
     nama                VARCHAR(100) NOT NULL,
     kasus               VARCHAR(255) NOT NULL,
@@ -456,179 +600,26 @@ CREATE TABLE narapidana (
 );
 ```
 
-| Kolom | Berasal dari | Terisi untuk kategori |
+![Database lapas di HeidiSQL](Asset/heidisql.png)
+
+### Langkah 3: Pastikan Program Terhubung ke Database
+
+Jalankan class `TesKoneksi.java` (klik kanan → Run File). Hasilnya:
+
+| Output | Artinya | Yang Perlu Dilakukan |
 |---|---|---|
-| `id_napi`, `nama`, `kasus`, `masa_tahanan`, `nomor_sel`, `blok_sel` | Atribut `Narapidana` (superclass) | Semua |
-| `kategori` | Hasil `getKategori()` | Semua |
-| `jenis_rehabilitasi` | `NarapidanaNarkotika` | NARKOTIKA |
-| `tingkat_risiko` | `NarapidanaTerorisme` | TERORISME |
-| `uang_pengganti` | `NarapidanaKorupsi` | KORUPSI |
-| `kategori_pembunuhan` | `NarapidanaPembunuhan` | PEMBUNUHAN |
-| `nilai_kerugian` | `NarapidanaPencurian` | PENCURIAN |
+| `Koneksi database berhasil!` | Program sudah terhubung ke database | Lanjut ke Langkah 4 |
+| `Koneksi database gagal!` | Program belum bisa terhubung |
 
-### 3. Koneksi Database (`KoneksiDatabase`)
+![Tes Koneksi](Asset/koneksi.png)
 
-Class `KoneksiDatabase` di package `config` bertugas membuat koneksi ke MySQL:
+### Langkah 4: Jalankan Program Utama
 
-```java
-public class KoneksiDatabase {
-
-    private static final String URL = "jdbc:mysql://localhost:3306/lapas";
-    private static final String USER = "root";
-    private static final String PASS = "";
-
-    private static Connection conn;
-
-    public static Connection getConnection() throws SQLException {
-        if (conn == null || conn.isClosed()) {
-            conn = DriverManager.getConnection(URL, USER, PASS);
-        }
-
-        return conn;
-    }
-}
-```
-
-| Bagian | Fungsi |
-|---|---|
-| `URL` | Alamat database: protokol `jdbc:mysql`, host `localhost`, port `3306`, nama database `lapas` |
-| `USER` dan `PASS` | Username dan password MySQL |
-| `DriverManager.getConnection()` | Membuka koneksi ke database |
-| `conn == null \|\| conn.isClosed()` | Koneksi baru hanya dibuat jika belum ada atau sudah tertutup |
-
-Untuk memastikan koneksi berhasil sebelum program utama dijalankan, tersedia class `TesKoneksi` yang memiliki `main()` sendiri:
-
-```java
-public class TesKoneksi {
-
-    public static void main(String[] args) {
-        try (Connection conn = KoneksiDatabase.getConnection()) {
-            System.out.println("Koneksi database berhasil!");
-        } catch (SQLException e) {
-            System.out.println("Koneksi database gagal!");
-            System.out.println(e.getMessage());
-        }
-    }
-}
-```
-
-### 4. Data Access Object (`NarapidanaDAO`)
-
-Seluruh perintah SQL dikumpulkan di class `NarapidanaDAO` (package `dao`). Controller tidak menulis SQL, hanya memanggil method DAO. Setiap operasi CRUD memiliki satu method:
-
-| Operasi | Method di DAO | Perintah SQL | Dipakai oleh menu |
-|---|---|---|---|
-| **Create** | `tambahNarapidana(Narapidana)` | `INSERT INTO narapidana ...` | Tambah Narapidana |
-| **Read (satu data)** | `cariNarapidanaById(String)` | `SELECT * FROM narapidana WHERE id_napi = ?` | Tambah (cek ID), Update, Hapus |
-| **Read (semua data)** | `getAllNarapidana()` | `SELECT * FROM narapidana ORDER BY id_napi` | Tampilkan, Tampilkan Berdasarkan Kategori |
-| **Update** | `updateNarapidana(Narapidana)` | `UPDATE narapidana SET nomor_sel = ?, blok_sel = ? WHERE id_napi = ?` | Update Nomor Sel |
-| **Delete** | `hapusNarapidana(String)` | `DELETE FROM narapidana WHERE id_napi = ?` | Hapus Narapidana |
-
-### 5. PreparedStatement
-
-Seluruh query menggunakan **\\`PreparedStatement` dengan tanda `?` sebagai placeholder, bukan menyambung string SQL secara langsung. Nilai dimasukkan lewat method `setString()`, `setInt()`, dan `setLong()`:
-
-```java
-public boolean hapusNarapidana(String idNapi) {
-    String sql = "DELETE FROM narapidana WHERE id_napi = ?";
-
-    try (Connection conn = KoneksiDatabase.getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-        pstmt.setString(1, idNapi);
-
-        int barisBerubah = pstmt.executeUpdate();
-        return barisBerubah > 0;
-
-    } catch (SQLException e) {
-        System.err.println("Gagal menghapus narapidana - " + e.getMessage());
-        return false;
-    }
-}
-```
-
-Dengan `PreparedStatement`, input pengguna diperlakukan sebagai data, bukan bagian dari perintah SQL, sehingga program aman dari serangan SQL Injection. Method `executeUpdate()` dipakai untuk `INSERT`, `UPDATE`, dan `DELETE` (mengembalikan jumlah baris yang berubah, sehingga `barisBerubah > 0` berarti berhasil), sedangkan `executeQuery()` dipakai untuk `SELECT` (mengembalikan `ResultSet`).
-
-### 6. Menyimpan Objek Subclass ke Database (INSERT)
-
-Pada `tambahNarapidana()`, kelima kolom atribut khusus pertama-tama diisi `NULL`, lalu `instanceof` dipakai untuk mengetahui subclass mana yang sedang disimpan dan mengisi satu kolom yang relevan saja:
-
-```java
-pstmt.setNull(8, java.sql.Types.VARCHAR);   // jenis_rehabilitasi
-pstmt.setNull(9, java.sql.Types.VARCHAR);   // tingkat_risiko
-pstmt.setNull(10, java.sql.Types.BIGINT);   // uang_pengganti
-pstmt.setNull(11, java.sql.Types.VARCHAR);  // kategori_pembunuhan
-pstmt.setNull(12, java.sql.Types.BIGINT);   // nilai_kerugian
-
-if (napi instanceof NarapidanaNarkotika) {
-    NarapidanaNarkotika n = (NarapidanaNarkotika) napi;
-    pstmt.setString(8, n.getJenisRehabilitasi());
-
-} else if (napi instanceof NarapidanaKorupsi) {
-    NarapidanaKorupsi n = (NarapidanaKorupsi) napi;
-    pstmt.setLong(10, n.getUangPengganti());
-}
-// ...dan seterusnya untuk Terorisme, Pembunuhan, dan Pencurian
-```
-
-### 7. Membaca Data dari Database (SELECT dan ResultSet)
-
-Hasil `SELECT` diterima dalam bentuk `ResultSet`, yaitu tabel hasil query yang dibaca baris demi baris menggunakan `rs.next()`. Setiap baris kemudian diubah menjadi objek Java oleh method `buatObjekNarapidana()`, yang memilih subclass berdasarkan nilai kolom `kategori`:
-
-```java
-private Narapidana buatObjekNarapidana(ResultSet rs) throws SQLException {
-
-    String id = rs.getString("id_napi");
-    String nama = rs.getString("nama");
-    // ...kolom umum lainnya...
-    String kategori = rs.getString("kategori");
-
-    switch (kategori) {
-        case "NARKOTIKA":
-            return new NarapidanaNarkotika(id, nama, kasus, masa, nomorSel, blokSel,
-                    rs.getString("jenis_rehabilitasi"));
-
-        case "KORUPSI":
-            return new NarapidanaKorupsi(id, nama, kasus, masa, nomorSel, blokSel,
-                    rs.getLong("uang_pengganti"));
-
-        // ...TERORISME, PEMBUNUHAN, dan PENCURIAN dengan pola yang sama
-
-        default:
-            return null;
-    }
-}
-```
-
-Dengan cara ini, data di database kembali menjadi objek `NarapidanaNarkotika`, `NarapidanaKorupsi`, dan seterusnya, sehingga seluruh konsep OOP di atas (inheritance, polymorphism, interface) tetap berjalan seperti biasa pada data yang berasal dari database.
-
-### 8. try-with-resources dan Penanganan Error
-
-- **try-with-resources**: `Connection`, `PreparedStatement`, dan `ResultSet` dideklarasikan di dalam tanda kurung `try (...)`, sehingga Java otomatis menutupnya setelah blok selesai, tanpa perlu memanggil `close()` secara manual dan tanpa risiko kebocoran resource.
-- **try-catch `SQLException`**: setiap method DAO membungkus operasi database dalam `try-catch`. Jika terjadi kesalahan (misalnya MySQL belum menyala atau ID duplikat), program menampilkan pesan kesalahan lalu mengembalikan `false` atau `null` (atau `List` kosong untuk `getAllNarapidana()`), sehingga program tidak crash dan Controller bisa menampilkan pesan yang sesuai ke pengguna.
-
-### 9. Alur Kerja MVC dengan DAO
-
-Alur saat pengguna memilih menu **Hapus Narapidana**:
-
-```text
-Main ──► AdminLapas.hapusNarapidana()          [Controller]
-              │
-              ├─► NarapidanaView.bacaTeks()      [View]   : membaca ID dari keyboard
-              │
-              ├─► NarapidanaDAO.cariNarapidanaById()      : SELECT, apakah ID ada?
-              │
-              ├─► NarapidanaDAO.hapusNarapidana()         : DELETE
-              │         │
-              │         └─► KoneksiDatabase.getConnection() ──► MySQL (database lapas)
-              │
-              └─► NarapidanaView.tampilkanPesan()[View]   : menampilkan hasil ke layar
-```
+Setelah koneksi berhasil, jalankan `Main.java` (klik kanan → Run File). Menu utama akan tampil dan program siap digunakan. Pastikan Laragon tetap menyala selama program berjalan.
 
 ---
 
-## 🖼️ Dokumentasi Hasil Uji Coba Program
-## Tampilan Menu Utama
+## Tampilan Program
 **1. Menu Utama**
 
 ![Menu Utama](Asset/menu.png)
@@ -713,14 +704,7 @@ Pesan error saat kolom yang seharusnya diisi angka justru diisi huruf/teks.
 Pesan error saat angka yang dimasukkan bernilai 0 atau negatif.
   <br> <br>
 
-**13. Tes Koneksi Database**
-
-![Tes Koneksi](Asset/koneksi.png)
-
-Hasil menjalankan `TesKoneksi.java`, menampilkan pesan "Koneksi database berhasil!" yang menandakan program sudah terhubung ke MySQL.
-  <br> <br>
-
-**14. Data Tersimpan di Database MySQL**
+**13. Data Tersimpan di Database MySQL**
 
 ![Tabel Database](Asset/database.png)
 
